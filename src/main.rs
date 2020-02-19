@@ -4,7 +4,6 @@ mod data;
 use data::{CloneRepo, Project, ToPath};
 use dialoguer::Confirmation;
 use enquirer::ColoredTheme;
-use fp_core::monad::*;
 use jfs::Store;
 use std::iter::Iterator;
 use std::str::FromStr;

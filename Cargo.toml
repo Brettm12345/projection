@@ -19,6 +19,9 @@ dialoguer = "0.5.0"
 fp-core = "0.1.9"
 jfs = "0.6.2"
 git2 = "0.11.0"
+parse = "0.1.2"
+url = "2.1.1"
 
 [dev-dependencies]
 quickcheck = "0.9.2"
+insta = "0.13.1"
