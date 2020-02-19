@@ -1,0 +1,9 @@
+[
+  { "name": "projection", "author": "brettm12345", "project_type": "github" },
+  {
+    "name": "xmonad-config",
+    "author": "brettm12345",
+    "project_type": "github"
+  },
+  { "name": "nixos-config", "author": "brettm12345", "project_type": "github" }
+]
