@@ -150,16 +150,6 @@ mod tests {
         assert_debug_snapshot!(project.to_url())
     }
     #[test]
-    fn serialize_project() {
-        let json = r#"
-            "source": "github",
-            "user": "brettm12345",
-            "repo": "projection"
-        }"#;
-        let result: Project = serde_json::from_str(json).unwrap();
-        assert_debug_snapshot!(result)
-    }
-    #[test]
     fn parse_project_source() {
         assert_eq!(
             Project::from_str("gh:brettm12345/xmonad-config"),
