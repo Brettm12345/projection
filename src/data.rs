@@ -129,28 +129,32 @@ impl CloneRepo for Project {
 mod tests {
     use super::*;
     use insta::assert_debug_snapshot;
+    use pretty_assertions::assert_eq;
+
     #[test]
-    fn test_display() {
-        let json = r#"
+    fn parse_from_json() {
+        let result: Project = serde_json::from_str(
+            r#"
         {
             "source": "github",
             "user": "brettm12345",
             "repo": "projection"
-        }"#;
-        let result: Project = serde_json::from_str(json).unwrap();
+        }"#,
+        )
+        .unwrap();
         assert_debug_snapshot!(result)
     }
     #[test]
-    fn project_to_url() {
-        let project = Project {
+    fn convert_to_url() {
+        assert_debug_snapshot!(Project {
             user: "brettm12345".to_owned(),
             repo: "projection".to_owned(),
             source: Source::GitHub,
-        };
-        assert_debug_snapshot!(project.to_url())
+        }
+        .to_url())
     }
     #[test]
-    fn parse_project_source() {
+    fn parse_from_input() {
         assert_eq!(
             Project::from_str("gh:brettm12345/xmonad-config"),
             Ok(Project {
