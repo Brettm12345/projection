@@ -1,13 +1,14 @@
 use colored::*;
+use fp_core::chain::Chain;
 use git2::Repository;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
 use std::path::{Path, PathBuf};
 use std::str::FromStr;
-use url::Url;
+use url::{ParseError, Url};
 
 pub trait ToUrl {
-    fn to_url(&self) -> Url;
+    fn to_url(&self) -> Result<Url, ParseError>;
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -45,13 +46,13 @@ impl FromStr for Source {
 }
 
 impl ToUrl for Source {
-    fn to_url(&self) -> Url {
+    fn to_url(&self) -> Result<Url, ParseError> {
         let l = match self {
             Source::GitHub => "github.com",
             Source::GitLab => "gitlab.com",
             Source::BitBucket => "bitbucket.com",
         };
-        Url::parse(&format!("https://{}", l)).unwrap()
+        Url::parse(&format!("https://{}", l))
     }
 }
 
@@ -66,27 +67,26 @@ impl FromStr for Project {
     type Err = String;
     fn from_str(s: &str) -> Result<Project, Self::Err> {
         let mut location = s.split(':');
-        let source = Source::from_str(location.nth(0).unwrap());
-        let mut path = location.nth(0).unwrap().split("/");
-        let user = path.nth(0);
-        let path = path.nth(0);
+        let source = location.nth(0).chain(|s| Source::from_str(s).ok());
+        let mut p = location.nth(0).map(|s| s.split("/")).unwrap();
+        let user = p.nth(0).map(String::from);
+        let path = p.nth(0).map(String::from);
         Ok(Project {
-            user: user.unwrap().to_string(),
+            user: user.unwrap(),
             source: source.unwrap(),
-            repo: path.unwrap().to_string(),
+            repo: path.unwrap(),
         })
     }
 }
 
 impl ToUrl for Project {
-    fn to_url(&self) -> Url {
+    fn to_url(&self) -> Result<Url, ParseError> {
         Url::parse(&format!(
             "{}{}/{}",
-            self.source.to_url().as_str(),
+            self.source.to_url()?.as_str(),
             self.user,
             self.repo
         ))
-        .unwrap()
     }
 }
 
@@ -119,7 +119,7 @@ pub trait CloneRepo {
 impl CloneRepo for Project {
     fn clone_repo(&self, root: &str) -> Result<Repository, git2::Error> {
         Repository::clone(
-            &format!("{}", &self.to_url().as_str()),
+            &format!("{}", &self.to_url().unwrap().as_str()),
             format!("{}/{}", root, self.to_path().to_str().unwrap()),
         )
     }

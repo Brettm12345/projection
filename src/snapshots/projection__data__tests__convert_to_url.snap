@@ -2,4 +2,6 @@
 source: src/data.rs
 expression: "Project{user: \"brettm12345\".to_owned(),\n        repo: \"projection\".to_owned(),\n        source: Source::GitHub,}.to_url()"
 ---
-"https://github.com/brettm12345/projection"
+Ok(
+    "https://github.com/brettm12345/projection",
+)
