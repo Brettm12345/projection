@@ -73,17 +73,3 @@ fn main() {
         _ => println!("Unknown command"),
     };
 }
-
-mod tests {
-    #[test]
-    fn add_project() {
-        let dir = tempfile::TempDir::new().unwrap();
-        let mut cmd = assert_cmd::Command::cargo_bin("projection").unwrap();
-        insta::assert_debug_snapshot!(cmd
-            .arg("-d")
-            .arg(dir.path().to_owned())
-            .arg("add")
-            .arg("gh:brettm12345/projection")
-            .assert())
-    }
-}
