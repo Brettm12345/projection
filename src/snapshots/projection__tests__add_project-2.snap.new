@@ -1,0 +1,16 @@
+---
+source: src/main.rs
+expression: "WalkDir::new(dir).min_depth(1)"
+---
+WalkDir {
+    opts: WalkDirOptions {
+        follow_links: false,
+        max_open: 10,
+        min_depth: 1,
+        max_depth: 18446744073709551615,
+        sorter: "None",
+        contents_first: false,
+        same_file_system: false,
+    },
+    root: "/tmp/.tmpX8Hks1",
+}

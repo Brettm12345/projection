@@ -4,9 +4,25 @@ mod data;
 use data::{CloneRepo, Project, ToPath};
 use dialoguer::Confirmation;
 use enquirer::ColoredTheme;
+use fuzzy_matcher::skim::SkimMatcherV2;
+use fuzzy_matcher::FuzzyMatcher;
 use jfs::Store;
-use std::iter::Iterator;
+use std::collections::BTreeMap;
+use std::iter::{FromIterator, Iterator};
 use std::str::FromStr;
+
+type Projects = BTreeMap<String, Project>;
+
+fn select_author(projects: Projects, author: &str) -> Projects {
+    let mut res = Projects::new();
+    for (id, project) in projects
+        .iter()
+        .filter(|(_, project)| project.user.eq(author))
+    {
+        res.insert(id.to_owned(), project.to_owned());
+    }
+    res
+}
 
 fn main() {
     let app = cli::build_cli();
@@ -14,8 +30,22 @@ fn main() {
     let mut cfg = jfs::Config::default();
     cfg.pretty = true;
     let db = Store::new_with_cfg("data", cfg).unwrap();
-    let projects = db.all::<Project>().unwrap();
+    let projects: Projects = db
+        .all()
+        .map(|p| match matches.value_of("author") {
+            Some(author) => select_author(p, author),
+            None => p,
+        })
+        .unwrap();
+
     let project_dir = matches.value_of("project-directory").unwrap();
+    let fuzzy_search = |q: &str| -> Vec<&Project> {
+        let matcher = SkimMatcherV2::default();
+        let fuzz = |p: &Project| -> Option<i64> { matcher.fuzzy_match(&format!("{}", p), q) };
+        let mut v = Vec::from_iter(projects.values().filter(|p| fuzz(p).is_some()));
+        v.sort_by(|&a, &b| fuzz(b).cmp(&fuzz(a)));
+        v
+    };
 
     let search = |string: &str| -> Option<(&String, &Project)> {
         projects
@@ -65,10 +95,32 @@ fn main() {
 
             _ => println!("Unable to find item"),
         },
-        _ => {
-            for (id, project) in projects.iter() {
-                println!("{}\t{}", id.cyan(), project);
-            }
-        }
+        ("search", Some(m)) => fuzzy_search(m.value_of("query").unwrap())
+            .iter()
+            .for_each(|project| println!("{}", project)),
+        _ => projects
+            .iter()
+            .for_each(|(id, project)| println!("{}\t{}", id.cyan(), project)),
     };
+}
+
+#[cfg(test)]
+mod tests {
+    use assert_cmd::Command;
+    use dir_diff;
+    use insta::assert_debug_snapshot;
+    use tempfile::tempdir;
+
+    #[test]
+    fn add_project() {
+        let project_dir = tempdir().unwrap();
+        assert_debug_snapshot!(Command::cargo_bin("projection")
+            .unwrap()
+            .arg("-d")
+            .arg(&format!("{}", project_dir.path().display()))
+            .arg("add")
+            .arg("gh:brettm12345/xmonad-config")
+            .assert());
+        assert!(dir_diff::is_different(project_dir.path(), tempdir().unwrap().path()).unwrap())
+    }
 }

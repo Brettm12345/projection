@@ -14,11 +14,14 @@ pub fn build_cli() -> App<'static, 'static> {
         .version("0.0.1")
         .long_about("The next generation project manager for the shell")
         .settings(&[ColoredHelp, DeriveDisplayOrder, InferSubcommands])
-        .args(&[arg("project-directory")
-            .short("d")
-            .default_value("projects")
-            .env("PROJECTION_PROJECT_DIR")])
-        .subcommand(sub("list").alias("ls"))
+        .args(&[
+            arg("project-directory")
+                .short("d")
+                .default_value("projects")
+                .env("PROJECTION_PROJECT_DIR"),
+            arg("author").short("a").takes_value(true),
+        ])
+        .subcommand(sub("search").alias("s").arg(arg("query").index(1)))
         .subcommand(sub("path").alias("p").arg(arg("name").index(1)))
         .subcommand(sub("remove").alias("rm").arg(arg("name").index(1)))
         .subcommand(

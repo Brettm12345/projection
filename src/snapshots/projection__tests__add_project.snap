@@ -1,6 +1,6 @@
 ---
 source: src/main.rs
-expression: "cmd.arg(\"-d\").arg(dir.path().to_owned()).arg(\"add\").arg(\"gh:brettm12345/projection\").assert()"
+expression: "cmd.unwrap().arg(\"-d\").arg(&format!(\"{}\", dir . path () . display\n                                    ())).arg(\"add\").arg(\"gh:brettm12345/xmonad-config\").assert()"
 ---
 Assert {
     output: Output {
@@ -9,7 +9,7 @@ Assert {
                 0,
             ),
         ),
-        stdout: "Successfully added brettm12345/projection to projects\n",
+        stdout: "Successfully added brettm12345/xmonad-config to projects\n",
         stderr: "",
     },
 }

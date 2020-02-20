@@ -124,8 +124,8 @@ impl CloneRepo for Project {
         )
     }
 }
-#[cfg(test)]
 
+#[cfg(test)]
 mod tests {
     use super::*;
     use insta::assert_debug_snapshot;
