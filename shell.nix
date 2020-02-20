@@ -3,7 +3,6 @@ stdenv.mkDerivation {
   name = "projection-shell-env";
   buildInputs = [
     clang
-    cargo
     cargo-bloat
     cargo-edit
     cargo-generate
