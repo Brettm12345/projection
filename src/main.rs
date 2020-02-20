@@ -1,14 +1,18 @@
 mod cli;
 use colored::*;
 mod data;
-use data::{CloneRepo, Project, ToPath};
+use data::{CloneRepo, Ensure, Project, ToPath};
 use dialoguer::Confirmation;
 use enquirer::ColoredTheme;
 use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
 use jfs::Store;
+use skim::{Skim, SkimOptionsBuilder};
 use std::collections::BTreeMap;
+use std::fs;
+use std::io::Cursor;
 use std::iter::{FromIterator, Iterator};
+use std::path::Path;
 use std::str::FromStr;
 
 type Projects = BTreeMap<String, Project>;
@@ -38,7 +42,8 @@ fn main() {
         })
         .unwrap();
 
-    let project_dir = matches.value_of("project-directory").unwrap();
+    let project_dir = Path::new(matches.value_of("project-directory").unwrap());
+
     let fuzzy_search = |q: &str| -> Vec<&Project> {
         let matcher = SkimMatcherV2::default();
         let fuzz = |p: &Project| -> Option<i64> { matcher.fuzzy_match(&format!("{}", p), q) };
@@ -46,11 +51,21 @@ fn main() {
         v.sort_by(|&a, &b| fuzz(b).cmp(&fuzz(a)));
         v
     };
+    let project_string = projects
+        .iter()
+        .fold("".to_string(), |line, (_, p)| format!("{}{}\n", line, p));
 
-    let search = |string: &str| -> Option<(&String, &Project)> {
+    let find = |string: &str| -> Option<(&String, &Project)> {
         projects
             .iter()
             .find(|(_, project)| project.repo.as_str().contains(string))
+    };
+
+    let confirm = |string: &str| {
+        Confirmation::with_theme(&ColoredTheme::default())
+            .with_text(string)
+            .interact()
+            .unwrap_or(false)
     };
 
     match matches.subcommand() {
@@ -64,18 +79,20 @@ fn main() {
         }
         ("remove", Some(m)) => {
             let query = m.value_of("name").unwrap();
-            match search(query) {
+            match find(query) {
                 Some((id, project)) => {
-                    if Confirmation::with_theme(&ColoredTheme::default())
-                        .with_text(&format!(
-                            "Are you sure you want to remove {} from your projects?",
-                            project
-                        ))
-                        .interact()
-                        .unwrap()
-                    {
+                    if confirm(&format!(
+                        "Are you sure you want to remove {} from your projects?",
+                        project
+                    )) {
+                        if confirm("Also remove the project directory") {
+                            match fs::remove_dir_all(project_dir.join(project.to_path())) {
+                                Ok(()) => println!("Deleted {}", project),
+                                _ => println!("Failed to remove dir project files"),
+                            }
+                        }
                         match db.delete(id) {
-                            Ok(()) => println!("Removed {}", id.cyan()),
+                            Ok(()) => println!("Removed from project list {}", id.cyan()),
                             err => println!(
                                 "Failed to remove {}\n{}: {:?}",
                                 project,
@@ -88,26 +105,60 @@ fn main() {
                 None => println!("Failed to find {} in projects", query),
             }
         }
-        ("path", Some(m)) => match search(m.value_of("name").unwrap()) {
-            Some((_, project)) => {
-                println!("{}/{}", project_dir, project.to_path().to_str().unwrap())
+        ("check", _) => {
+            for (_, project) in projects.iter() {
+                match project.ensure(project_dir) {
+                    Ok(_) => continue,
+                    _ => {
+                        if confirm(&format!(
+                            "Project {} is missing. Would you like to clone it",
+                            project
+                        )) {
+                            project.clone_repo(project_dir).unwrap();
+                        }
+                    }
+                }
             }
+        }
+        ("path", Some(m)) => match find(m.value_of("name").unwrap()) {
+            Some((_, project)) => println!(
+                "{}",
+                project_dir
+                    .join(project.to_path())
+                    .as_path()
+                    .to_str()
+                    .unwrap()
+            ),
 
             _ => println!("Unable to find item"),
         },
-        ("search", Some(m)) => fuzzy_search(m.value_of("query").unwrap())
+        ("select", _) => {
+            let selected_items = Skim::run_with(
+                &SkimOptionsBuilder::default()
+                    .height(Some("50%"))
+                    .multi(true)
+                    .ansi(true)
+                    .build()
+                    .unwrap(),
+                Some(Box::new(Cursor::new(project_string))),
+            )
+            .map(|out| out.selected_items)
+            .unwrap_or_else(Vec::new);
+
+            for item in selected_items.iter() {
+                println!("{:#?}", item);
+            }
+        }
+        ("search", Some(m)) => fuzzy_search(m.value_of("query").unwrap_or_else(|| ""))
             .iter()
             .for_each(|project| println!("{}", project)),
-        _ => projects
-            .iter()
-            .for_each(|(id, project)| println!("{}\t{}", id.cyan(), project)),
+        _ => println!("{}", project_string),
     };
 }
 
 #[cfg(test)]
 mod tests {
     use assert_cmd::Command;
-    use dir_diff;
     use insta::assert_debug_snapshot;
     use tempfile::tempdir;
 

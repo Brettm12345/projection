@@ -22,7 +22,7 @@ stdenv.mkDerivation {
     openssl.dev
     rustup
     rustfmt
-    latest.rustChannels.nightly.rust
+    latest_rust
   ];
   OPENSSL_DEV = openssl.dev;
   LIBCLANG_PATH = "${llvmPackages.libclang}/lib";

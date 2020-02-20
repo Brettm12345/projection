@@ -4,10 +4,8 @@ use clap::{
     Arg, SubCommand,
 };
 
-fn arg<'a>(name: &'a str) -> Arg {
-    Arg::with_name(name).long(name)
-}
 pub fn build_cli() -> App<'static, 'static> {
+    let arg = |name| Arg::with_name(name).long(name);
     let sub = |name| SubCommand::with_name(name);
     App::new("Projection")
         .author("brettm12345")
@@ -21,13 +19,16 @@ pub fn build_cli() -> App<'static, 'static> {
                 .env("PROJECTION_PROJECT_DIR"),
             arg("author").short("a").takes_value(true),
         ])
-        .subcommand(sub("search").alias("s").arg(arg("query").index(1)))
-        .subcommand(sub("path").alias("p").arg(arg("name").index(1)))
-        .subcommand(sub("remove").alias("rm").arg(arg("name").index(1)))
-        .subcommand(
-            sub("add")
-                .alias("a")
-                .help("gh:USER/REPO gl:USER_REPO bb:USER/REPO")
-                .arg(arg("source").index(1)),
-        )
+        .subcommands(vec![
+            sub("search").alias("s").arg(arg("query").index(1)),
+            sub("select").alias("sel"),
+            sub("check").alias("c"),
+            sub("path").alias("p").arg(arg("name").index(1)),
+            sub("remove").alias("rm").arg(arg("name").index(1)),
+            sub("add").alias("a").arg(
+                arg("source")
+                    .help("gh:user/repo gl:user/repo bb:user/repo")
+                    .index(1),
+            ),
+        ])
 }

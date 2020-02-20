@@ -9,6 +9,12 @@ This project is still in it's beta stages.
 
 - [ ] Add more tests.
 - [ ] Remove all uses of `unwrap`.
-- [ ] Handle removal project directories from filesystem.
+- [x] Handle removal project directories from filesystem.
 - [ ] Add custom tagging.
-- [ ] Add syntax to search through projects.
+- [-] Add syntax to search through projects.
+- [ ] Setup shell plugin generation.
+- [ ] Improve completions.
+- [ ] Setup full testing environment.
+- [ ] Add filters by language.
+- [ ] Allow the user to define their own output format.
+- [ ] Customized preview.

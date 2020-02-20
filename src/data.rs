@@ -113,15 +113,28 @@ impl Display for Project {
 }
 
 pub trait CloneRepo {
-    fn clone_repo(&self, root: &str) -> Result<Repository, git2::Error>;
+    fn clone_repo<P: AsRef<Path>>(&self, root: P) -> Result<Repository, git2::Error>;
 }
 
 impl CloneRepo for Project {
-    fn clone_repo(&self, root: &str) -> Result<Repository, git2::Error> {
+    fn clone_repo<P: AsRef<Path>>(&self, root: P) -> Result<Repository, git2::Error> {
         Repository::clone(
-            &format!("{}", &self.to_url().unwrap().as_str()),
-            format!("{}/{}", root, self.to_path().to_str().unwrap()),
+            &self.to_url().unwrap().as_str(),
+            root.as_ref()
+                .join(self.to_path())
+                .to_str()
+                .unwrap_or("Failed to parse url"),
         )
+    }
+}
+
+pub trait Ensure {
+    fn ensure<P: AsRef<Path>>(&self, root: P) -> Result<Repository, git2::Error>;
+}
+
+impl Ensure for Project {
+    fn ensure<P: AsRef<Path>>(&self, root: P) -> Result<Repository, git2::Error> {
+        Repository::open(root.as_ref().join(self.to_path()))
     }
 }
 
