@@ -1,11 +1,14 @@
 { sources ? import ./sources.nix }:
-import sources.nixpkgs {
+let rust = import ./rust.nix { inherit sources; };
+in import sources.nixpkgs {
   overlays = [
-    (import sources.nixpkgs-mozilla)
     (self: super:
       with self; {
         niv = (import sources.niv { }).niv;
-        naersk = callPackage sources.naersk { };
+        naersk = callPackage sources.naersk {
+          rustc = rust.rust;
+          cargo = rust.rust;
+        };
       })
   ];
 }
