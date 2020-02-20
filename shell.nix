@@ -1,11 +1,6 @@
-let
-  moz_overlay = import (builtins.fetchTarball
-    "https://github.com/mozilla/nixpkgs-mozilla/archive/master.tar.gz");
-  pkgs = import <nixpkgs> { overlays = [ moz_overlay ]; };
-  sources = import ./nix/sources.nix;
-in with pkgs;
+with import ./nix { };
 stdenv.mkDerivation {
-  name = "moz_overlay_shell";
+  name = "projection-shell-env";
   buildInputs = [
     clang
     cargo
