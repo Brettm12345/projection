@@ -9,7 +9,7 @@ pub fn build_cli() -> App<'static, 'static> {
     let sub = |name| SubCommand::with_name(name);
     App::new("Projection")
         .author("brettm12345")
-        .version("0.0.1")
+        .version("0.2.0")
         .long_about("The next generation project manager for the shell")
         .settings(&[ColoredHelp, DeriveDisplayOrder, InferSubcommands])
         .args(&[

@@ -1,6 +1,6 @@
 [package]
 name = "projection"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["brettm12345 <brettmandler@gmail.com>"]
 build = "./build.rs"
 edition = "2018"
