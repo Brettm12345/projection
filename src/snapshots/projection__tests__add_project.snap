@@ -1,0 +1,15 @@
+---
+source: src/main.rs
+expression: "cmd.arg(\"add\").arg(\"gh:brettm12345/projection\").assert()"
+---
+Assert {
+    output: Output {
+        status: ExitStatus(
+            ExitStatus(
+                0,
+            ),
+        ),
+        stdout: "Successfully added \u{1b}[34mbrettm12345\u{1b}[0m/\u{1b}[35mprojection\u{1b}[0m to projects\n",
+        stderr: "",
+    },
+}

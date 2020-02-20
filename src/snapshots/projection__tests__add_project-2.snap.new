@@ -1,0 +1,15 @@
+---
+source: src/main.rs
+expression: "cmd.arg(\"-d\").arg(dir.path().to_owned()).arg(\"list\").assert()"
+---
+Assert {
+    output: Output {
+        status: ExitStatus(
+            ExitStatus(
+                256,
+            ),
+        ),
+        stdout: "",
+        stderr: "error: Found argument \'-d\' which wasn\'t expected, or isn\'t valid in this context\n\nUSAGE:\n    projection add [source]\n\nFor more information try --help\n",
+    },
+}
