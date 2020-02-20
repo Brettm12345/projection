@@ -1,4 +1,4 @@
-# Projection
+# Projection ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/brettm12345/projection/Test?label=Tests&logo=github&style=flat-square)
 
 > Next generation project management cli
 

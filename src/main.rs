@@ -75,9 +75,6 @@ fn main() {
 }
 
 mod tests {
-    use assert_cmd::Command;
-    use insta::assert_debug_snapshot;
-    use tempfile::TempDir;
     #[test]
     fn add_project() {
         let dir = TempDir::new().unwrap();
