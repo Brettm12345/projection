@@ -1,6 +1,6 @@
 use clap::{
     App,
-    AppSettings::{ColoredHelp, DeriveDisplayOrder, InferSubcommands, SubcommandRequiredElseHelp},
+    AppSettings::{ColoredHelp, DeriveDisplayOrder, InferSubcommands},
     Arg, SubCommand,
 };
 
@@ -13,12 +13,7 @@ pub fn build_cli() -> App<'static, 'static> {
         .author("brettm12345")
         .version("0.0.1")
         .long_about("The next generation project manager for the shell")
-        .settings(&[
-            ColoredHelp,
-            DeriveDisplayOrder,
-            InferSubcommands,
-            SubcommandRequiredElseHelp,
-        ])
+        .settings(&[ColoredHelp, DeriveDisplayOrder, InferSubcommands])
         .args(&[arg("project-directory")
             .short("d")
             .default_value("projects")

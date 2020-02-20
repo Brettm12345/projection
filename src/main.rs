@@ -65,11 +65,10 @@ fn main() {
 
             _ => println!("Unable to find item"),
         },
-        ("list", _) => {
+        _ => {
             for (id, project) in projects.iter() {
                 println!("{}\t{}", id.cyan(), project);
             }
         }
-        _ => println!("Unknown command"),
     };
 }
