@@ -13,13 +13,11 @@ clap = "2.33.0"
 clap = "2.33.0"
 serde_json = "1.0.48"
 serde = { version = "1.0.104", features = ["derive"] }
-ansi_term = "0.12.1"
 enquirer = "0.3.0"
 dialoguer = "0.5.0"
 fp-core = "0.1.9"
 jfs = "0.6.2"
 git2 = "0.11.0"
-parse = "0.1.2"
 url = "2.1.1"
 colored = "1.9.2"
 
