@@ -1,5 +1,5 @@
 mod cli;
-use ansi_term::Color::Cyan;
+use colored::*;
 mod data;
 use data::{CloneRepo, Project, ToPath};
 use dialoguer::Confirmation;
@@ -28,8 +28,8 @@ fn main() {
             let project = Project::from_str(m.value_of("source").unwrap()).unwrap();
             project.clone_repo(project_dir).unwrap();
             match db.save(&project) {
-                Ok(_) => println!("Successfully added {} to projects", project),
-                _ => println!("Error adding {} to projects", project),
+                Ok(_) => println!("{} added {} to projects", "Successfully".green(), project),
+                _ => println!("{} adding {} to projects", "Error".red(), project),
             }
         }
         ("remove", Some(m)) => {
@@ -45,8 +45,13 @@ fn main() {
                         .unwrap()
                     {
                         match db.delete(id) {
-                            Ok(()) => println!("Removed {}", id),
-                            err => println!("Failed to remove {}\nError: {:?}", project, err),
+                            Ok(()) => println!("Removed {}", id.cyan()),
+                            err => println!(
+                                "Failed to remove {}\n{}: {:?}",
+                                project,
+                                "Error".red(),
+                                err
+                            ),
                         }
                     }
                 }
@@ -62,7 +67,7 @@ fn main() {
         },
         ("list", _) => {
             for (id, project) in projects.iter() {
-                println!("{}\t{}", Cyan.paint(id), project);
+                println!("{}\t{}", id.cyan(), project);
             }
         }
         _ => println!("Unknown command"),
