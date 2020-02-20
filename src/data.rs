@@ -1,4 +1,4 @@
-use ansi_term::Color::{Blue, Purple};
+use colored::*;
 use git2::Repository;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
@@ -108,7 +108,7 @@ impl ToPath for Project {
 
 impl Display for Project {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}/{}", Blue.paint(&self.user), Purple.paint(&self.repo))
+        write!(f, "{}/{}", &self.user.blue(), &self.repo.purple())
     }
 }
 
