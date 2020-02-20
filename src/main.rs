@@ -78,8 +78,8 @@ mod tests {
     #[test]
     fn add_project() {
         let dir = TempDir::new().unwrap();
-        let mut cmd = Command::cargo_bin("projection").unwrap();
-        assert_debug_snapshot!(cmd
+        let mut cmd = assert_cmd::Command::cargo_bin("projection").unwrap();
+        insta::assert_debug_snapshot!(cmd
             .arg("-d")
             .arg(dir.path().to_owned())
             .arg("add")
