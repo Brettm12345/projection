@@ -18,3 +18,5 @@ This project is still in it's beta stages.
 - [ ] Add filters by language.
 - [ ] Allow the user to define their own output format.
 - [ ] Customized preview.
+- [ ] Vim plugin
+- [ ] Integrate with [Projectile](bbatsov/projectile)
