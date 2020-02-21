@@ -79,28 +79,34 @@ fn main() {
                 _ => println!("{} adding {} to projects", "Error".red(), project),
             }
         }
-        ("remove", Some(m)) => match m.value_of("name").chain(find) {
-            Some((id, project)) => {
-                if confirm(&format!(
-                    "Are you sure you want to remove {} from your projects?",
-                    project
-                )) {
-                    if confirm("Also remove the project directory") {
-                        match fs::remove_dir_all(project_dir.join(project.to_path())) {
-                            Ok(_) => println!("Deleted {}", project),
-                            _ => println!("Failed to remove dir project files"),
+        ("remove", Some(m)) => {
+            let query = m.value_of("name");
+            match query.chain(find) {
+                Some((id, project)) => {
+                    if confirm(&format!(
+                        "Are you sure you want to remove {} from your projects?",
+                        project
+                    )) {
+                        if confirm("Also remove the project directory") {
+                            match fs::remove_dir_all(project_dir.join(project.to_path())) {
+                                Ok(_) => println!("Deleted {}", project),
+                                _ => println!("Failed to remove dir project files"),
+                            }
                         }
-                    }
-                    match db.delete(id) {
-                        Ok(_) => println!("Removed from project list {}", id.cyan()),
-                        err => {
-                            println!("Failed to remove {}\n{}: {:?}", project, "Error".red(), err)
+                        match db.delete(id) {
+                            Ok(_) => println!("Removed from project list {}", id.cyan()),
+                            err => println!(
+                                "Failed to remove {}\n{}: {:?}",
+                                project,
+                                "Error".red(),
+                                err
+                            ),
                         }
                     }
                 }
+                None => println!("Failed to find {} in projects", query.unwrap_or("")),
             }
-            None => println!("Failed to find {} in projects", query),
-        },
+        }
         ("check", _) => {
             projects
                 .iter()
