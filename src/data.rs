@@ -118,13 +118,17 @@ pub trait CloneRepo {
 
 impl CloneRepo for Project {
     fn clone_repo<P: AsRef<Path>>(&self, root: P) -> Result<Repository, git2::Error> {
-        Repository::clone(
-            &self.to_url().unwrap().as_str(),
-            root.as_ref()
-                .join(self.to_path())
-                .to_str()
-                .unwrap_or("Failed to parse url"),
-        )
+        self.to_url()
+            .map_err(|_| git2::Error::from_str("Failed to parse url"))
+            .chain(|url| {
+                Repository::clone(
+                    url.as_str(),
+                    root.as_ref()
+                        .join(self.to_path())
+                        .to_str()
+                        .unwrap_or(&format!("Failed to parse project path of {}", self)),
+                )
+            })
     }
 }
 
