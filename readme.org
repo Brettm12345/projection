@@ -1,18 +1,18 @@
-# Projection ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/brettm12345/projection/Test?label=Tests&logo=github&style=flat-square)
+* Projection ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/brettm12345/projection/Test?label=Tests&logo=github&style=flat-square)
 
 > Next generation project management cli
 
 Projection is a project manager for the command line.
 This project is still in it's beta stages.
 
-## Todo
+** Todo [3/15]
 
 - [-] Add more tests.
 - [-] Remove all uses of `unwrap`.
-- [x] Handle removal project directories from filesystem.
+- [X] Handle removal project directories from filesystem.
 - [ ] Add custom tagging.
-- [x] Add fuzzy searching.
-- [x] Setup local db to store projects and metadata.
+- [X] Add fuzzy searching.
+- [X] Setup local db to store projects and metadata.
 - [-] Add syntax to search through projects.
 - [ ] Setup shell plugin generation.
 - [ ] Improve completions.
