@@ -11,6 +11,8 @@ This project is still in it's beta stages.
 - [-] Remove all uses of `unwrap`.
 - [x] Handle removal project directories from filesystem.
 - [ ] Add custom tagging.
+- [x] Add fuzzy searching.
+- [x] Setup local db to store projects and metadata.
 - [-] Add syntax to search through projects.
 - [ ] Setup shell plugin generation.
 - [ ] Improve completions.
