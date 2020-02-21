@@ -20,14 +20,17 @@ pub fn build_cli() -> App<'static, 'static> {
             arg("author").short("a").takes_value(true),
         ])
         .subcommands(vec![
-            sub("search").alias("s").arg(arg("query").index(1)),
-            sub("select").alias("sel"),
-            sub("check").alias("c"),
-            sub("path").alias("p").arg(arg("name").index(1)),
-            sub("remove").alias("rm").arg(arg("name").index(1)),
-            sub("add").alias("a").arg(
+            sub("search").visible_alias("s").arg(arg("query").index(1)),
+            sub("select").visible_alias("sel"),
+            sub("check").visible_alias("c"),
+            sub("path").visible_alias("p").arg(arg("name").index(1)),
+            sub("remove")
+                .visible_aliases(&["rm", "r"])
+                .arg(arg("name").index(1)),
+            sub("add").visible_alias("a").arg(
                 arg("source")
                     .help("gh:user/repo gl:user/repo bb:user/repo")
+                    .takes_value(true)
                     .index(1),
             ),
         ])
