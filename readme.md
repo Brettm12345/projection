@@ -7,8 +7,8 @@ This project is still in it's beta stages.
 
 ## Todo
 
-- [ ] Add more tests.
-- [ ] Remove all uses of `unwrap`.
+- [-] Add more tests.
+- [-] Remove all uses of `unwrap`.
 - [x] Handle removal project directories from filesystem.
 - [ ] Add custom tagging.
 - [-] Add syntax to search through projects.

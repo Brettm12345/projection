@@ -79,38 +79,33 @@ fn main() {
                 _ => println!("{} adding {} to projects", "Error".red(), project),
             }
         }
-        ("remove", Some(m)) => {
-            let query = m.value_of("name").unwrap();
-            match find(query) {
-                Some((id, project)) => {
-                    if confirm(&format!(
-                        "Are you sure you want to remove {} from your projects?",
-                        project
-                    )) {
-                        if confirm("Also remove the project directory") {
-                            match fs::remove_dir_all(project_dir.join(project.to_path())) {
-                                Ok(_) => println!("Deleted {}", project),
-                                _ => println!("Failed to remove dir project files"),
-                            }
+        ("remove", Some(m)) => match m.value_of("name").chain(find) {
+            Some((id, project)) => {
+                if confirm(&format!(
+                    "Are you sure you want to remove {} from your projects?",
+                    project
+                )) {
+                    if confirm("Also remove the project directory") {
+                        match fs::remove_dir_all(project_dir.join(project.to_path())) {
+                            Ok(_) => println!("Deleted {}", project),
+                            _ => println!("Failed to remove dir project files"),
                         }
-                        match db.delete(id) {
-                            Ok(_) => println!("Removed from project list {}", id.cyan()),
-                            err => println!(
-                                "Failed to remove {}\n{}: {:?}",
-                                project,
-                                "Error".red(),
-                                err
-                            ),
+                    }
+                    match db.delete(id) {
+                        Ok(_) => println!("Removed from project list {}", id.cyan()),
+                        err => {
+                            println!("Failed to remove {}\n{}: {:?}", project, "Error".red(), err)
                         }
                     }
                 }
-                None => println!("Failed to find {} in projects", query),
             }
-        }
+            None => println!("Failed to find {} in projects", query),
+        },
         ("check", _) => {
-            for (_, project) in projects.iter() {
-                match project.ensure(project_dir) {
-                    Ok(_) => continue,
+            projects
+                .iter()
+                .for_each(|(_, project)| match project.ensure(project_dir) {
+                    Ok(_) => (),
                     _ => {
                         if confirm(&format!(
                             "Project {} is missing. Would you like to clone it",
@@ -119,8 +114,7 @@ fn main() {
                             project.clone_repo(project_dir).unwrap();
                         }
                     }
-                }
-            }
+                })
         }
         ("path", Some(m)) => match m.value_of("name").chain(find) {
             Some((_, project)) => println!(
@@ -134,23 +128,19 @@ fn main() {
 
             _ => println!("Unable to find item"),
         },
-        ("select", _) => {
-            let selected_items = Skim::run_with(
-                &SkimOptionsBuilder::default()
-                    .height(Some("50%"))
-                    .multi(true)
-                    .ansi(true)
-                    .build()
-                    .unwrap(),
-                Some(Box::new(Cursor::new(project_string))),
-            )
-            .map(|out| out.selected_items)
-            .unwrap_or_else(Vec::new);
-
-            for item in selected_items.iter() {
-                println!("{:#?}", item);
-            }
-        }
+        ("select", _) => Skim::run_with(
+            &SkimOptionsBuilder::default()
+                .height(Some("50%"))
+                .multi(true)
+                .ansi(true)
+                .build()
+                .unwrap(),
+            Some(Box::new(Cursor::new(project_string))),
+        )
+        .map(|out| out.selected_items)
+        .unwrap_or_else(Vec::new)
+        .iter()
+        .for_each(|item| println!("{:#?}", item)),
         ("search", Some(m)) => fuzzy_search(m.value_of("query").unwrap_or(""))
             .iter()
             .for_each(|project| println!("{}", project)),
