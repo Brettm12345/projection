@@ -4,6 +4,7 @@ mod data;
 use data::{CloneRepo, Ensure, Project, ToPath};
 use dialoguer::Confirmation;
 use enquirer::ColoredTheme;
+use fp_core::chain::Chain;
 use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
 use jfs::Store;
@@ -120,7 +121,7 @@ fn main() {
                 }
             }
         }
-        ("path", Some(m)) => match find(m.value_of("name").unwrap()) {
+        ("path", Some(m)) => match m.value_of("name").chain(find) {
             Some((_, project)) => println!(
                 "{}",
                 project_dir
