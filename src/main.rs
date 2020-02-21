@@ -19,14 +19,11 @@ use std::str::FromStr;
 type Projects = BTreeMap<String, Project>;
 
 fn select_author(projects: Projects, author: &str) -> Projects {
-    let mut res = Projects::new();
-    for (id, project) in projects
+    projects
         .iter()
         .filter(|(_, project)| project.user.eq(author))
-    {
-        res.insert(id.to_owned(), project.to_owned());
-    }
-    res
+        .map(|(id, project)| (id.to_owned(), project.to_owned()))
+        .collect()
 }
 
 fn main() {
@@ -71,7 +68,11 @@ fn main() {
 
     match matches.subcommand() {
         ("add", Some(m)) => {
-            let project = Project::from_str(m.value_of("source").unwrap()).unwrap();
+            let project = m
+                .value_of("source")
+                .ok_or("No source provided".to_owned())
+                .chain(Project::from_str)
+                .unwrap();
             project.clone_repo(project_dir).unwrap();
             match db.save(&project) {
                 Ok(_) => println!("{} added {} to projects", "Successfully".green(), project),
@@ -88,12 +89,12 @@ fn main() {
                     )) {
                         if confirm("Also remove the project directory") {
                             match fs::remove_dir_all(project_dir.join(project.to_path())) {
-                                Ok(()) => println!("Deleted {}", project),
+                                Ok(_) => println!("Deleted {}", project),
                                 _ => println!("Failed to remove dir project files"),
                             }
                         }
                         match db.delete(id) {
-                            Ok(()) => println!("Removed from project list {}", id.cyan()),
+                            Ok(_) => println!("Removed from project list {}", id.cyan()),
                             err => println!(
                                 "Failed to remove {}\n{}: {:?}",
                                 project,
@@ -150,7 +151,7 @@ fn main() {
                 println!("{:#?}", item);
             }
         }
-        ("search", Some(m)) => fuzzy_search(m.value_of("query").unwrap_or_else(|| ""))
+        ("search", Some(m)) => fuzzy_search(m.value_of("query").unwrap_or(""))
             .iter()
             .for_each(|project| println!("{}", project)),
         _ => println!("{}", project_string),
