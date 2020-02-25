@@ -153,23 +153,3 @@ fn main() {
         _ => println!("{}", project_string),
     };
 }
-
-#[cfg(test)]
-mod tests {
-    use assert_cmd::Command;
-    use insta::assert_debug_snapshot;
-    use tempfile::tempdir;
-
-    #[test]
-    fn add_project() {
-        let project_dir = tempdir().unwrap();
-        assert_debug_snapshot!(Command::cargo_bin("projection")
-            .unwrap()
-            .arg("-d")
-            .arg(&format!("{}", project_dir.path().display()))
-            .arg("add")
-            .arg("gh:brettm12345/xmonad-config")
-            .assert());
-        assert!(dir_diff::is_different(project_dir.path(), tempdir().unwrap().path()).unwrap())
-    }
-}
