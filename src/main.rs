@@ -70,7 +70,7 @@ fn main() {
         ("add", Some(m)) => {
             let project = m
                 .value_of("source")
-                .ok_or("No source provided".to_owned())
+                .ok_or_else(|| "No source provided".to_owned())
                 .chain(Project::from_str)
                 .unwrap();
             project.clone_repo(project_dir).unwrap();

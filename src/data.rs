@@ -7,8 +7,10 @@ use std::path::{Path, PathBuf};
 use std::str::FromStr;
 use url::{ParseError, Url};
 
+type UrlResult = Result<Url, ParseError>;
+
 pub trait ToUrl {
-    fn to_url(&self) -> Result<Url, ParseError>;
+    fn to_url(&self) -> UrlResult;
 }
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
@@ -46,13 +48,15 @@ impl FromStr for Source {
 }
 
 impl ToUrl for Source {
-    fn to_url(&self) -> Result<Url, ParseError> {
-        let l = match self {
-            Source::GitHub => "github.com",
-            Source::GitLab => "gitlab.com",
-            Source::BitBucket => "bitbucket.com",
-        };
-        Url::parse(&format!("https://{}", l))
+    fn to_url(&self) -> UrlResult {
+        Url::parse(&format!(
+            "https://{}",
+            match self {
+                Source::GitHub => "github.com",
+                Source::GitLab => "gitlab.com",
+                Source::BitBucket => "bitbucket.com",
+            }
+        ))
     }
 }
 
@@ -67,26 +71,27 @@ impl FromStr for Project {
     type Err = String;
     fn from_str(s: &str) -> Result<Project, Self::Err> {
         let mut location = s.split(':');
-        let source = location.nth(0).chain(|s| Source::from_str(s).ok());
-        let mut p = location.nth(0).map(|s| s.split("/")).unwrap();
-        let user = p.nth(0).map(String::from);
-        let path = p.nth(0).map(String::from);
+        let source = location.next().chain(|s| Source::from_str(s).ok()).unwrap();
+        let mut path = location
+            .next()
+            .map(|s| s.split('/'))
+            .unwrap()
+            .map(String::from)
+            .collect::<Vec<String>>()
+            .into_iter();
         Ok(Project {
-            user: user.unwrap(),
-            source: source.unwrap(),
-            repo: path.unwrap(),
+            user: path.next().unwrap(),
+            source,
+            repo: path.next().unwrap(),
         })
     }
 }
 
 impl ToUrl for Project {
-    fn to_url(&self) -> Result<Url, ParseError> {
-        Url::parse(&format!(
-            "{}{}/{}",
-            self.source.to_url()?.as_str(),
-            self.user,
-            self.repo
-        ))
+    fn to_url(&self) -> UrlResult {
+        self.source
+            .to_url()?
+            .join(&format!("{}/{}", self.user, self.repo))
     }
 }
 
@@ -112,32 +117,30 @@ impl Display for Project {
     }
 }
 
+type RepoResult = Result<Repository, git2::Error>;
 pub trait CloneRepo {
-    fn clone_repo<P: AsRef<Path>>(&self, root: P) -> Result<Repository, git2::Error>;
+    fn clone_repo<P: AsRef<Path>>(&self, root: P) -> RepoResult;
 }
 
 impl CloneRepo for Project {
-    fn clone_repo<P: AsRef<Path>>(&self, root: P) -> Result<Repository, git2::Error> {
-        self.to_url()
-            .map_err(|_| git2::Error::from_str("Failed to parse url"))
-            .chain(|url| {
-                Repository::clone(
-                    url.as_str(),
-                    root.as_ref()
-                        .join(self.to_path())
-                        .to_str()
-                        .unwrap_or(&format!("Failed to parse project path of {}", self)),
-                )
-            })
+    fn clone_repo<P: AsRef<Path>>(&self, root: P) -> RepoResult {
+        Repository::clone(
+            self.to_url()
+                .map_err(|_| git2::Error::from_str(&format!("Failed to parse url from {}", self)))?
+                .as_str(),
+            root.as_ref().join(self.to_path()).to_str().ok_or_else(|| {
+                git2::Error::from_str(&format!("Failed to parse path from {}", self))
+            })?,
+        )
     }
 }
 
 pub trait Ensure {
-    fn ensure<P: AsRef<Path>>(&self, root: P) -> Result<Repository, git2::Error>;
+    fn ensure<P: AsRef<Path>>(&self, root: P) -> RepoResult;
 }
 
 impl Ensure for Project {
-    fn ensure<P: AsRef<Path>>(&self, root: P) -> Result<Repository, git2::Error> {
+    fn ensure<P: AsRef<Path>>(&self, root: P) -> RepoResult {
         Repository::open(root.as_ref().join(self.to_path()))
     }
 }
@@ -146,7 +149,6 @@ impl Ensure for Project {
 mod tests {
     use super::*;
     use insta::assert_debug_snapshot;
-    use pretty_assertions::assert_eq;
 
     #[test]
     fn parse_from_json() {
@@ -162,23 +164,9 @@ mod tests {
         assert_debug_snapshot!(result)
     }
     #[test]
-    fn convert_to_url() {
-        assert_debug_snapshot!(Project {
-            user: "brettm12345".to_owned(),
-            repo: "projection".to_owned(),
-            source: Source::GitHub,
-        }
-        .to_url())
-    }
-    #[test]
-    fn parse_from_input() {
-        assert_eq!(
-            Project::from_str("gh:brettm12345/xmonad-config"),
-            Ok(Project {
-                user: "brettm12345".to_owned(),
-                repo: "xmonad-config".to_owned(),
-                source: Source::GitHub
-            })
-        )
+    fn parse_and_convert_to_url() {
+        assert_debug_snapshot!(Project::from_str("gh:brettm12345/xmonad-config")
+            .unwrap()
+            .to_url())
     }
 }

@@ -1,0 +1,7 @@
+---
+source: src/data.rs
+expression: "Project::from_str(\"gh:brettm12345/xmonad-config\").unwrap().to_url()"
+---
+Ok(
+    "https://github.com/brettm12345/xmonad-config",
+)

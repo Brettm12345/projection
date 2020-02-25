@@ -1,3 +1,9 @@
 {
-  "nixEnvSelector.nixShellConfig": "${workspaceRoot}/shell.nix"
+  "nixEnvSelector.nixShellConfig": "${workspaceRoot}/shell.nix",
+  "cSpell.words": [
+    "dialoguer",
+    "gitlab",
+    "tempdir",
+    "tempfile"
+  ]
 }
