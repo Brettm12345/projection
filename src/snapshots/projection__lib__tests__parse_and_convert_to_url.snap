@@ -1,5 +1,5 @@
 ---
-source: src/data.rs
+source: src/lib.rs
 expression: "Project::from_str(\"gh:brettm12345/xmonad-config\").unwrap().to_url()"
 ---
 Ok(

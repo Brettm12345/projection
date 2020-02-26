@@ -1,5 +1,0 @@
----
-source: src/data.rs
-expression: project.to_url()
----
-"https://github.com/brettm12345/projection"
