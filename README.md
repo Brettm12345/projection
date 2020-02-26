@@ -10,6 +10,7 @@ This project is still in it's beta stages.
 - [x] Remove all uses of `unwrap`. _Note:_ `unwrap` is still used inside tests and the main function.
 - [x] Handle removal project directories from filesystem.
 - [ ] Add custom tagging.
+- [x] Add `no-confirm` option.
 - [x] Add fuzzy searching.
 - [x] Setup local db to store projects and metadata.
 - [x] Add syntax to search through projects.
