@@ -88,7 +88,9 @@ fn main() {
                         project
                     )) {
                         match db.delete(id) {
-                            Ok(_) => println!("{} from project list {}", "Removed".red(), id.cyan()),
+                            Ok(_) => {
+                                println!("{} from project list {}", "Removed".red(), id.cyan())
+                            }
                             err => println!(
                                 "{} to remove {}\n{}: {:?}",
                                 "Failed".red(),
@@ -100,7 +102,9 @@ fn main() {
                         if confirm("Also remove the project directory") {
                             let project_path = project_dir.join(project.to_path());
                             match fs::remove_dir_all(&project_path) {
-                                Ok(_) => println!("Deleted {}", &project_path.to_str().unwrap().cyan()),
+                                Ok(_) => {
+                                    println!("Deleted {}", &project_path.to_str().unwrap().cyan())
+                                }
                                 _ => println!("Failed to remove dir project files"),
                             }
                         }

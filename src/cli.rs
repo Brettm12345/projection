@@ -21,7 +21,9 @@ pub fn build_cli() -> App<'static, 'static> {
         ])
         .subcommands(vec![
             sub("search").visible_alias("s").arg(arg("query").index(1)),
-            sub("select").visible_alias("sel").arg(arg("query").index(1)),
+            sub("select")
+                .visible_alias("sel")
+                .arg(arg("query").index(1)),
             sub("check").visible_alias("c"),
             sub("path").visible_alias("p").arg(arg("name").index(1)),
             sub("remove")
