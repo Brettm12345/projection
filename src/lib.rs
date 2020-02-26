@@ -100,18 +100,17 @@ impl ToUrl for Project {
 }
 
 pub trait ToPath {
-    fn to_path(&self) -> PathBuf;
+    fn to_path<P: AsRef<Path>>(&self, root: P) -> PathBuf;
 }
 
 impl ToPath for Project {
-    fn to_path(&self) -> PathBuf {
-        Path::new(&format!(
+    fn to_path<P: AsRef<Path>>(&self, root: P) -> PathBuf {
+        root.as_ref().join(Path::new(&format!(
             "{}--{}--{}",
             self.source.to_string(),
             self.user,
             self.repo
-        ))
-        .to_path_buf()
+        )))
     }
 }
 
@@ -132,8 +131,7 @@ impl CloneRepo for Project {
             self.to_url()
                 .map_err(|_| Error::from_str(&format!("Failed to parse url from {}", self)))?
                 .as_str(),
-            root.as_ref()
-                .join(self.to_path())
+            self.to_path(root)
                 .to_str()
                 .ok_or_else(|| Error::from_str(&format!("Failed to parse path from {}", self)))?,
         )
@@ -146,7 +144,7 @@ pub trait Ensure {
 
 impl Ensure for Project {
     fn ensure<P: AsRef<Path>>(&self, root: P) -> RepoResult {
-        Repository::open(root.as_ref().join(self.to_path()))
+        Repository::open(self.to_path(root))
     }
 }
 

@@ -21,7 +21,8 @@ pub fn build_cli() -> App<'static, 'static> {
             arg("project-directory")
                 .short("d")
                 .default_value("projects")
-                .env("PROJECTION_PROJECT_DIR"),
+                .env("PROJECTION_PROJECT_DIR")
+                .takes_value(true),
             arg("author").short("a").takes_value(true),
         ])
         .subcommands(vec![
@@ -30,7 +31,7 @@ pub fn build_cli() -> App<'static, 'static> {
                 .visible_alias("sel")
                 .arg(arg("query").index(1)),
             sub("ensure")
-                .visible_alias("c")
+                .visible_aliases(&["en", "e"])
                 .help("Check the list of known projects for any missing repos and clone them"),
             sub("path").visible_alias("p").arg(arg("name").index(1)),
             sub("remove")

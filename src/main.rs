@@ -1,13 +1,13 @@
 mod cli;
 use colored::*;
-mod data;
-use data::{CloneRepo, Ensure, Project, ToPath};
+mod lib;
 use dialoguer::Confirmation;
 use enquirer::ColoredTheme;
 use fp_core::chain::Chain;
 use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
 use jfs::Store;
+use lib::{CloneRepo, Ensure, Project, ToPath};
 use skim::{Skim, SkimOptionsBuilder};
 use std::collections::BTreeMap;
 use std::fs;
@@ -102,12 +102,12 @@ fn main() {
                             ),
                         }
                         if confirm("Also remove the project directory") {
-                            let project_path = project_dir.join(project.to_path());
-                            match fs::remove_dir_all(&project_path) {
+                            let path = project.to_path(project_dir);
+                            match fs::remove_dir_all(&path) {
                                 Ok(_) => println!(
                                     "{} {}",
                                     "Deleted".red(),
-                                    &project_path.to_str().unwrap().cyan()
+                                    &path.to_str().unwrap().cyan()
                                 ),
                                 _ => println!("{} to remove dir project files", "Failed".red()),
                             }
@@ -137,16 +137,9 @@ fn main() {
                 })
         }
         ("path", Some(m)) => match m.value_of("name").chain(find) {
-            Some((_, project)) => println!(
-                "{}",
-                project_dir
-                    .join(project.to_path())
-                    .as_path()
-                    .to_str()
-                    .unwrap()
-            ),
+            Some((_, project)) => println!("{}", project.to_path(project_dir).to_str().unwrap()),
 
-            _ => println!("Unable to find item"),
+            _ => println!("{}: Unable to find item", "Error".red()),
         },
         ("select", Some(m)) => Skim::run_with(
             &SkimOptionsBuilder::default()
