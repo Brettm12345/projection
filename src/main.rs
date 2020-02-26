@@ -70,7 +70,7 @@ fn main() {
         ("add", Some(m)) => {
             let project = m
                 .value_of("source")
-                .ok_or_else(|| "No source provided".to_owned())
+                .ok_or_else(|| String::from("No source provided"))
                 .chain(Project::from_str)
                 .unwrap();
             project.clone_repo(project_dir).unwrap();
@@ -87,20 +87,22 @@ fn main() {
                         "Are you sure you want to remove {} from your projects?",
                         project
                     )) {
-                        if confirm("Also remove the project directory") {
-                            match fs::remove_dir_all(project_dir.join(project.to_path())) {
-                                Ok(_) => println!("Deleted {}", project),
-                                _ => println!("Failed to remove dir project files"),
-                            }
-                        }
                         match db.delete(id) {
-                            Ok(_) => println!("Removed from project list {}", id.cyan()),
+                            Ok(_) => println!("{} from project list {}", "Removed".red(), id.cyan()),
                             err => println!(
-                                "Failed to remove {}\n{}: {:?}",
+                                "{} to remove {}\n{}: {:?}",
+                                "Failed".red(),
                                 project,
                                 "Error".red(),
                                 err
                             ),
+                        }
+                        if confirm("Also remove the project directory") {
+                            let project_path = project_dir.join(project.to_path());
+                            match fs::remove_dir_all(&project_path) {
+                                Ok(_) => println!("Deleted {}", &project_path.to_str().unwrap().cyan()),
+                                _ => println!("Failed to remove dir project files"),
+                            }
                         }
                     }
                 }
