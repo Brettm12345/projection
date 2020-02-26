@@ -60,10 +60,11 @@ fn main() {
     };
 
     let confirm = |string: &str| {
-        Confirmation::with_theme(&ColoredTheme::default())
-            .with_text(string)
-            .interact()
-            .unwrap_or(false)
+        matches.value_of("no-confirm").unwrap_or_else(|| "false") == "true"
+            || Confirmation::with_theme(&ColoredTheme::default())
+                .with_text(string)
+                .interact()
+                .unwrap_or(false)
     };
 
     match matches.subcommand() {
@@ -120,7 +121,7 @@ fn main() {
                 ),
             }
         }
-        ("check", _) => {
+        ("ensure", _) => {
             projects
                 .iter()
                 .for_each(|(_, project)| match project.ensure(project_dir) {

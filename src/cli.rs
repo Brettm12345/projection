@@ -13,6 +13,11 @@ pub fn build_cli() -> App<'static, 'static> {
         .long_about("The next generation project manager for the shell")
         .settings(&[ColoredHelp, DeriveDisplayOrder, InferSubcommands])
         .args(&[
+            arg("no-confirm")
+                .short("n")
+                .default_value("false")
+                .env("PROJECTION_NO_CONFIRM")
+                .takes_value(true),
             arg("project-directory")
                 .short("d")
                 .default_value("projects")
@@ -24,7 +29,9 @@ pub fn build_cli() -> App<'static, 'static> {
             sub("select")
                 .visible_alias("sel")
                 .arg(arg("query").index(1)),
-            sub("check").visible_alias("c"),
+            sub("ensure")
+                .visible_alias("c")
+                .help("Check the list of known projects for any missing repos and clone them"),
             sub("path").visible_alias("p").arg(arg("name").index(1)),
             sub("remove")
                 .visible_aliases(&["rm", "r"])
