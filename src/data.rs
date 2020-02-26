@@ -1,5 +1,6 @@
 use colored::*;
 use fp_core::chain::Chain;
+use git2::Error;
 use git2::Repository;
 use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display};
@@ -80,9 +81,9 @@ impl FromStr for Project {
             .collect::<Vec<String>>()
             .into_iter();
         Ok(Project {
-            user: path.next().unwrap(),
+            user: path.next().ok_or("Error")?,
             source,
-            repo: path.next().unwrap(),
+            repo: path.next().ok_or("Error")?,
         })
     }
 }
@@ -117,7 +118,7 @@ impl Display for Project {
     }
 }
 
-type RepoResult = Result<Repository, git2::Error>;
+type RepoResult = Result<Repository, Error>;
 pub trait CloneRepo {
     fn clone_repo<P: AsRef<Path>>(&self, root: P) -> RepoResult;
 }
@@ -126,11 +127,12 @@ impl CloneRepo for Project {
     fn clone_repo<P: AsRef<Path>>(&self, root: P) -> RepoResult {
         Repository::clone(
             self.to_url()
-                .map_err(|_| git2::Error::from_str(&format!("Failed to parse url from {}", self)))?
+                .map_err(|_| Error::from_str(&format!("Failed to parse url from {}", self)))?
                 .as_str(),
-            root.as_ref().join(self.to_path()).to_str().ok_or_else(|| {
-                git2::Error::from_str(&format!("Failed to parse path from {}", self))
-            })?,
+            root.as_ref()
+                .join(self.to_path())
+                .to_str()
+                .ok_or_else(|| Error::from_str(&format!("Failed to parse path from {}", self)))?,
         )
     }
 }
