@@ -9,7 +9,7 @@ Assert {
                 0,
             ),
         ),
-        stdout: "Successfully added brettm12345/xmonad-config to projects\n",
+        stdout: "Cloning brettm12345/xmonad-config...\nSuccessfully added brettm12345/xmonad-config to projects\n",
         stderr: "",
     },
 }

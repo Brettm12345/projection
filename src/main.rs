@@ -73,6 +73,7 @@ fn main() {
                 .ok_or_else(|| String::from("No source provided"))
                 .chain(Project::from_str)
                 .unwrap();
+            println!("{} {}...", "Cloning".green(), project);
             project.clone_repo(project_dir).unwrap();
             match db.save(&project) {
                 Ok(_) => println!("{} added {} to projects", "Successfully".green(), project),
@@ -103,14 +104,14 @@ fn main() {
                             let project_path = project_dir.join(project.to_path());
                             match fs::remove_dir_all(&project_path) {
                                 Ok(_) => {
-                                    println!("Deleted {}", &project_path.to_str().unwrap().cyan())
+                                    println!("{} {}", "Deleted".red(), &project_path.to_str().unwrap().cyan())
                                 }
-                                _ => println!("Failed to remove dir project files"),
+                                _ => println!("{} to remove dir project files", "Failed".red()),
                             }
                         }
                     }
                 }
-                None => println!("Failed to find {} in projects", query.unwrap_or("")),
+                None => println!("{} to find {} in projects", "Failed".red(), query.unwrap_or("")),
             }
         }
         ("check", _) => {
@@ -120,7 +121,7 @@ fn main() {
                     Ok(_) => (),
                     _ => {
                         if confirm(&format!(
-                            "Project {} is missing. Would you like to clone it",
+                            "{} is missing. Would you like to clone it",
                             project
                         )) {
                             project.clone_repo(project_dir).unwrap();
