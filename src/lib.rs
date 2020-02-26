@@ -24,12 +24,11 @@ pub enum Source {
 
 impl ToString for Source {
     fn to_string(&self) -> String {
-        match &self {
+        String::from(match &self {
             Source::BitBucket => "bb",
             Source::GitLab => "gl",
             Source::GitHub => "gh",
-        }
-        .to_string()
+        })
     }
 }
 
@@ -127,13 +126,18 @@ pub trait CloneRepo {
 
 impl CloneRepo for Project {
     fn clone_repo<P: AsRef<Path>>(&self, root: P) -> RepoResult {
+        println!("{} {}...", "Cloning".green(), self);
+        let err = |item: &str| {
+            Error::from_str(&format!(
+                "{} to parse {} from {}",
+                "Failed".red(),
+                item.underline(),
+                self
+            ))
+        };
         Repository::clone(
-            self.to_url()
-                .map_err(|_| Error::from_str(&format!("Failed to parse url from {}", self)))?
-                .as_str(),
-            self.to_path(root)
-                .to_str()
-                .ok_or_else(|| Error::from_str(&format!("Failed to parse path from {}", self)))?,
+            self.to_url().map_err(|_| err("url"))?.as_str(),
+            self.to_path(root).to_str().ok_or_else(|| err("path"))?,
         )
     }
 }

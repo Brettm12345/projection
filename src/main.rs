@@ -74,7 +74,6 @@ fn main() {
                 .ok_or_else(|| String::from("No source provided"))
                 .chain(Project::from_str)
                 .unwrap();
-            println!("{} {}...", "Cloning".green(), project);
             project.clone_repo(project_dir).unwrap();
             match db.save(&project) {
                 Ok(_) => println!("{} added {} to projects", "Successfully".green(), project),
