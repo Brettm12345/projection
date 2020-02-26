@@ -136,9 +136,10 @@ fn main() {
 
             _ => println!("Unable to find item"),
         },
-        ("select", _) => Skim::run_with(
+        ("select", Some(m)) => Skim::run_with(
             &SkimOptionsBuilder::default()
                 .height(Some("50%"))
+                .query(m.value_of("query"))
                 .multi(true)
                 .ansi(true)
                 .build()
