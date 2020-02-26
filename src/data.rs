@@ -72,11 +72,14 @@ impl FromStr for Project {
     type Err = String;
     fn from_str(s: &str) -> Result<Project, Self::Err> {
         let mut location = s.split(':');
-        let source = location.next().chain(|s| Source::from_str(s).ok()).unwrap();
+        let source = location
+            .next()
+            .chain(|s| Source::from_str(s).ok())
+            .ok_or("Error")?;
         let mut path = location
             .next()
             .map(|s| s.split('/'))
-            .unwrap()
+            .ok_or("Error")?
             .map(String::from)
             .collect::<Vec<String>>()
             .into_iter();

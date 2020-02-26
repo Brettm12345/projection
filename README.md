@@ -7,7 +7,7 @@ This project is still in it's beta stages.
 
 ## Todo
 
-- [ ] Remove all uses of `unwrap`.
+- [x] Remove all uses of `unwrap`. _Note:_ `unwrap` is still used inside tests and the main function.
 - [x] Handle removal project directories from filesystem.
 - [ ] Add custom tagging.
 - [x] Add fuzzy searching.
