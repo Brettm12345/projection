@@ -103,15 +103,21 @@ fn main() {
                         if confirm("Also remove the project directory") {
                             let project_path = project_dir.join(project.to_path());
                             match fs::remove_dir_all(&project_path) {
-                                Ok(_) => {
-                                    println!("{} {}", "Deleted".red(), &project_path.to_str().unwrap().cyan())
-                                }
+                                Ok(_) => println!(
+                                    "{} {}",
+                                    "Deleted".red(),
+                                    &project_path.to_str().unwrap().cyan()
+                                ),
                                 _ => println!("{} to remove dir project files", "Failed".red()),
                             }
                         }
                     }
                 }
-                None => println!("{} to find {} in projects", "Failed".red(), query.unwrap_or("")),
+                None => println!(
+                    "{} to find {} in projects",
+                    "Failed".red(),
+                    query.unwrap_or("")
+                ),
             }
         }
         ("check", _) => {
