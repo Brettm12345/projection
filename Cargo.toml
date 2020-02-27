@@ -22,6 +22,7 @@ url = "2.1.1"
 colored = "1.9.2"
 fuzzy-matcher = "0.3.3"
 skim = "0.7.0"
+serde_dhall = "0.3.0"
 
 [dev-dependencies]
 cargo-insta = "0.13.0"

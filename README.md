@@ -10,6 +10,7 @@ This project is still in it's beta stages.
 - [x] Remove all uses of `unwrap`. _Note:_ `unwrap` is still used inside tests and the main function.
 - [x] Handle removal project directories from filesystem.
 - [ ] Add custom tagging.
+- [ ] Add support for a `projection` or a `.projection` file at the root of the project. Supported file formats will be `dhall`, `toml`, `yaml` and `json`
 - [x] Add `no-confirm` option.
 - [x] Add fuzzy searching.
 - [x] Setup local db to store projects and metadata.
