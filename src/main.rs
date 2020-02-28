@@ -77,8 +77,16 @@ fn main() {
                 .unwrap();
             project.clone_repo(project_dir).unwrap();
             match db.save(&project) {
-                Ok(_) => println!("{} added {} to projects", "Successfully".green(), project),
-                _ => println!("{} adding {} to projects", "Error".red(), project),
+                Ok(_) => println!(
+                    "{msg} added {project} to projects",
+                    msg = "Successfully".green(),
+                    project = project
+                ),
+                _ => println!(
+                    "{msg} adding {project} to projects",
+                    msg = "Error".red(),
+                    project = project
+                ),
             }
         }
         ("remove", Some(m)) => {
@@ -86,13 +94,15 @@ fn main() {
             match query.chain(find) {
                 Some((id, project)) => {
                     if confirm(&format!(
-                        "Are you sure you want to remove {} from your projects?",
-                        project
+                        "Are you sure you want to remove {project} from your projects?",
+                        project = project
                     )) {
                         match db.delete(id) {
-                            Ok(_) => {
-                                println!("{} from project list {}", "Removed".red(), id.cyan())
-                            }
+                            Ok(_) => println!(
+                                "{msg} from project list {id}",
+                                msg = "Removed".red(),
+                                id = id.cyan()
+                            ),
                             err => println!(
                                 "{} to remove {}\n{}: {:?}",
                                 "Failed".red(),
@@ -105,9 +115,9 @@ fn main() {
                             let path = project.to_path(project_dir);
                             match fs::remove_dir_all(&path) {
                                 Ok(_) => println!(
-                                    "{} {}",
-                                    "Deleted".red(),
-                                    &path.to_str().unwrap().cyan()
+                                    "{msg} {path}",
+                                    msg = "Deleted".red(),
+                                    path = &path.to_str().unwrap().cyan()
                                 ),
                                 _ => println!("{} to remove dir project files", "Failed".red()),
                             }
@@ -115,9 +125,9 @@ fn main() {
                     }
                 }
                 None => println!(
-                    "{} to find {} in projects",
-                    "Failed".red(),
-                    query.unwrap_or("")
+                    "{msg} to find {query} in projects",
+                    msg = "Failed".red(),
+                    query = query.unwrap_or("")
                 ),
             }
         }

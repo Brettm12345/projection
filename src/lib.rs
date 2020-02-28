@@ -94,9 +94,11 @@ impl FromStr for Project {
 
 impl ToUrl for Project {
     fn to_url(&self) -> UrlResult {
-        self.source
-            .to_url()?
-            .join(&format!("{}/{}", self.user, self.repo))
+        self.source.to_url()?.join(&format!(
+            "{user}/{repo}",
+            user = self.user,
+            repo = self.repo
+        ))
     }
 }
 
@@ -107,17 +109,22 @@ pub trait ToPath {
 impl ToPath for Project {
     fn to_path<P: AsRef<Path>>(&self, root: P) -> PathBuf {
         root.as_ref().join(Path::new(&format!(
-            "{}--{}--{}",
-            self.source.to_string(),
-            self.user,
-            self.repo
+            "{source}--{user}--{repo}",
+            source = self.source.to_string(),
+            user = self.user,
+            repo = self.repo
         )))
     }
 }
 
 impl Display for Project {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "{}/{}", &self.user.blue(), &self.repo.purple())
+        write!(
+            f,
+            "{user}/{repo}",
+            user = &self.user.blue(),
+            repo = &self.repo.purple()
+        )
     }
 }
 
@@ -128,13 +135,17 @@ pub trait CloneRepo {
 
 impl CloneRepo for Project {
     fn clone_repo<P: AsRef<Path>>(&self, root: P) -> RepoResult {
-        println!("{} {}...", "Cloning".green(), self);
+        println!(
+            "{msg} {project}...",
+            msg = "Cloning".green(),
+            project = self
+        );
         let err = |item: &str| {
             Error::from_str(&format!(
-                "{} to parse {} from {}",
-                "Failed".red(),
-                item.underline(),
-                self
+                "{msg} to parse {item} from {project}",
+                msg = "Failed".red(),
+                item = item.underline(),
+                project = self
             ))
         };
         Repository::clone(
