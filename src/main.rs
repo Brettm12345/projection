@@ -7,7 +7,7 @@ use fp_core::chain::Chain;
 use fuzzy_matcher::skim::SkimMatcherV2;
 use fuzzy_matcher::FuzzyMatcher;
 use jfs::Store;
-use lib::{CloneRepo, Ensure, Project, ToPath};
+use lib::{set_name, CloneRepo, Ensure, Project, ToPath};
 use skim::{Skim, SkimOptionsBuilder};
 use std::collections::BTreeMap;
 use std::fs;
@@ -73,6 +73,7 @@ fn main() {
                 .value_of("source")
                 .ok_or_else(|| String::from("No source provided"))
                 .chain(Project::from_str)
+                .map(set_name(matches.value_of("name").map(|s| s.to_string())))
                 .unwrap();
             project.clone_repo(project_dir).unwrap();
             match db.save(&project) {
@@ -156,7 +157,7 @@ fn main() {
         .for_each(|item| println!("{:#?}", item)),
         ("search", Some(m)) => fuzzy_search(m.value_of("query").unwrap_or(""))
             .iter()
-            .for_each(|project| println!("{}", project)),
+            .for_each(|project| println!("{}", project)), // I wish this could be pointfree
         _ => println!("{}", project_string),
     };
 }

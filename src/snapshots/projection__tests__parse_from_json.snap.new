@@ -1,0 +1,10 @@
+---
+source: src/lib.rs
+expression: result
+---
+Project {
+    user: "brettm12345",
+    repo: "projection",
+    name: None,
+    source: GitHub,
+}

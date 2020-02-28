@@ -11,14 +11,15 @@ This project is still in it's beta stages.
 - [x] Handle removal project directories from filesystem.
 - [ ] Add custom tagging.
 - [ ] Add support for a `projection` or a `.projection` file at the root of the project. Supported file formats will be `dhall`, `toml`, `yaml` and `json`
-- [x] Add `no-confirm` option.
-- [x] Add fuzzy searching.
-- [x] Setup local db to store projects and metadata.
-- [x] Add syntax to search through projects.
-- [ ] Setup shell plugin generation.
-- [ ] Improve completions.
+- [ ] Interactively create projects.
+- [ ] Tui for searching and managing projects.
+- [x] `no-confirm` option.
+- [x] Fuzzy searching.
+- [x] Local db to store projects and metadata.
+- [x] Syntax to search through projects.
+- [ ] Shell plugin generation.
 - [x] Setup testing environment.
-- [ ] Add filters by language.
+- [ ] Filter by language.
 - [ ] Allow the user to define their own output format.
 - [ ] Customized preview.
 - [ ] Vim plugin

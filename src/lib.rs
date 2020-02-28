@@ -64,6 +64,7 @@ impl ToUrl for Source {
 pub struct Project {
     pub user: String,
     pub repo: String,
+    pub name: Option<String>,
     pub source: Source,
 }
 
@@ -84,6 +85,7 @@ impl FromStr for Project {
             .into_iter();
         Ok(Project {
             user: path.next().ok_or("Error")?,
+            name: None,
             source,
             repo: path.next().ok_or("Error")?,
         })
@@ -149,6 +151,14 @@ pub trait Ensure {
 impl Ensure for Project {
     fn ensure<P: AsRef<Path>>(&self, root: P) -> RepoResult {
         Repository::open(self.to_path(root))
+    }
+}
+
+// https://github.com/JasonShin/fp-core.rs#currying
+pub fn set_name(name: Option<String>) -> impl (Fn(Project) -> Project) {
+    move |p| Project {
+        name: name.as_ref().map(|s| s.to_string()),
+        ..p
     }
 }
 

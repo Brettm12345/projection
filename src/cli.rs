@@ -14,7 +14,7 @@ pub fn build_cli() -> App<'static, 'static> {
         .settings(&[ColoredHelp, DeriveDisplayOrder, InferSubcommands])
         .args(&[
             arg("no-confirm")
-                .short("n")
+                .short("N")
                 .default_value("false")
                 .env("PROJECTION_NO_CONFIRM")
                 .takes_value(true),
@@ -37,11 +37,14 @@ pub fn build_cli() -> App<'static, 'static> {
             sub("remove")
                 .visible_aliases(&["rm", "r"])
                 .arg(arg("name").index(1)),
-            sub("add").visible_alias("a").arg(
+            sub("add").visible_alias("a").args(&[
+                arg("name").short("n").takes_value(true).help(
+                    "The project name (if not provided the name of the repo will be used instead)",
+                ),
                 arg("source")
                     .help("gh:user/repo gl:user/repo bb:user/repo")
                     .takes_value(true)
                     .index(1),
-            ),
+            ]),
         ])
 }
