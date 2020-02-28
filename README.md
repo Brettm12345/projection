@@ -5,6 +5,10 @@
 Projection is a project manager for the command line.
 This project is still in it's beta stages.
 
+## Screenshot
+
+[Sreenshot](./sreenshot.png)
+
 ## Todo
 
 - [x] Remove all uses of `unwrap`. _Note:_ `unwrap` is still used inside tests and the main function.
