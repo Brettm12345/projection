@@ -107,6 +107,7 @@ pub trait ToPath {
 }
 
 impl ToPath for Project {
+    /// Get the path to the project
     fn to_path<P: AsRef<Path>>(&self, root: P) -> PathBuf {
         root.as_ref().join(Path::new(&format!(
             "{source}--{user}--{repo}",
@@ -134,6 +135,7 @@ pub trait CloneRepo {
 }
 
 impl CloneRepo for Project {
+    /// Clone a project from git
     fn clone_repo<P: AsRef<Path>>(&self, root: P) -> RepoResult {
         println!(
             "{msg} {project}...",
@@ -165,7 +167,7 @@ impl Ensure for Project {
     }
 }
 
-// https://github.com/JasonShin/fp-core.rs#currying
+/// https://github.com/JasonShin/fp-core.rs#currying
 pub fn set_name(name: Option<String>) -> impl (Fn(Project) -> Project) {
     move |p| Project {
         name: name.as_ref().map(|s| s.to_string()),

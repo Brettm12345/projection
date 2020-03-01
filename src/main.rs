@@ -59,7 +59,7 @@ fn main() {
             .find(|(_, project)| project.repo.as_str().contains(string))
     };
 
-    let confirm = |string: &str| {
+    let confirm = |string: &str| -> bool {
         matches.value_of("no-confirm").unwrap_or_else(|| "false") == "true"
             || Confirmation::with_theme(&ColoredTheme::default())
                 .with_text(string)

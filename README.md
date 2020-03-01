@@ -7,7 +7,7 @@ This project is still in it's beta stages.
 
 ## Screenshot
 
-[Sreenshot](./sreenshot.png)
+[Sreenshot](sreenshot.png)
 
 ## Todo
 

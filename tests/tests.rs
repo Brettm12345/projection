@@ -1,6 +1,7 @@
 mod testenv;
 use testenv::TestEnv;
 #[cfg(test)]
+#[ignore]
 #[test]
 fn add_project() {
     let te = TestEnv::new();

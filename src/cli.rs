@@ -6,7 +6,7 @@ use clap::{
 
 pub fn build_cli() -> App<'static, 'static> {
     let arg = |name| Arg::with_name(name).long(name);
-    let sub = |name| SubCommand::with_name(name);
+    let sub = SubCommand::with_name;
     App::new("Projection")
         .author("brettm12345")
         .version("0.2.0")
@@ -38,9 +38,7 @@ pub fn build_cli() -> App<'static, 'static> {
                 .visible_aliases(&["rm", "r"])
                 .arg(arg("name").index(1)),
             sub("add").visible_alias("a").args(&[
-                arg("name").short("n").takes_value(true).help(
-                    "The project name (if not provided the name of the repo will be used instead)",
-                ),
+                Arg::from_usage("--name -n NAME 'The project name (if not provided the name of the repo will be used instead)'"),
                 arg("source")
                     .help("gh:user/repo gl:user/repo bb:user/repo")
                     .takes_value(true)
