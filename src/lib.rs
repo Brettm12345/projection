@@ -1,5 +1,7 @@
 use colored::*;
 use fp_core::chain::Chain;
+use fp_core::compose;
+use fp_core::compose::*;
 use git2::Error;
 use git2::Repository;
 use serde::{Deserialize, Serialize};
@@ -142,14 +144,15 @@ impl CloneRepo for Project {
             msg = "Cloning".green(),
             project = self
         );
-        let err = |item: &str| {
-            Error::from_str(&format!(
+        let err = compose!(
+            |item: &str| format!(
                 "{msg} to parse {item} from {project}",
                 msg = "Failed".red(),
                 item = item.underline(),
                 project = self
-            ))
-        };
+            ),
+            |s| Error::from_str(s.as_ref())
+        );
         Repository::clone(
             self.to_url().map_err(|_| err("url"))?.as_str(),
             self.to_path(root).to_str().ok_or_else(|| err("path"))?,

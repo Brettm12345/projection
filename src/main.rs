@@ -131,24 +131,18 @@ fn main() {
                 ),
             }
         }
-        ("ensure", _) => {
-            projects
-                .iter()
-                .for_each(|(_, project)| match project.ensure(project_dir) {
-                    Ok(_) => (),
-                    _ => {
-                        if confirm(&format!(
-                            "{} is missing. Would you like to clone it",
-                            project
-                        )) {
-                            project.clone_repo(project_dir).unwrap();
-                        }
-                    }
-                })
-        }
+        ("ensure", _) => projects.iter().for_each(|(_, project)| {
+            if project.ensure(project_dir).is_err()
+                && confirm(&format!(
+                    "{} is missing. Would you like to clone it",
+                    project
+                ))
+            {
+                project.clone_repo(project_dir).unwrap();
+            }
+        }),
         ("path", Some(m)) => match m.value_of("name").chain(find) {
             Some((_, project)) => println!("{}", project.to_path(project_dir).to_str().unwrap()),
-
             _ => println!("{}: Unable to find item", "Error".red()),
         },
         ("select", Some(m)) => Skim::run_with(
